@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--注册service注解-->
+    <context:component-scan base-package="com.baizhi.service"/>
+    <context:component-scan base-package="com.baizhi.facade"/>
+
+    <!--开启spring 整合shiro 框架 的集成开发-->
+    <!--声明shiro 请求处理对象-->
+    <!--传入 安全管理器 引用 id 必须是 shiroFilterFactoryBean -->
+    <!--这里我创建的是我的 wbe.xml 创建的那个 delegtingFilterProxy()的过滤器的 属性参数的 value  targetBeanName(目标bean名称) 中的 value 参数-->
+    <bean id="shiroFilterFactoryBean" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!--声明 我的 安全管理器  (属性)-->
+        <!--   引入  安全管理器对象  -->
+        <property name="securityManager" ref="securityManager" />
+        <!-- 认证 失败时 进入的页面-->
+        <property name="loginUrl" value="/login.jsp"></property>
+        <!-- 确定我的拦截对象-->
+        <property name="filterChainDefinitions">
+                <value>
+                    /main/main.jsp=user
+                </value>
+        </property>
+    </bean>
+
+    <!-- 安全管理器-->
+    <!-- 创建我的安全 管理器 对象  -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <!-- 为安全管理器对象中的realms属性注入 数据-->
+        <property name="realms"><!-- 注意我的realms 是一个集合-->
+            <!--给realms集合添加元素-->
+            <list><!--向这个集合中放入我自定义的realm 类对象-->
+                <ref bean="realm"></ref> <!--放入属性-->
+            </list>
+        </property>
+
+        <!--使用spring配置我 remeberMe 的时候
+
+            第一 需要定义remeber Manager 管理者(属性) 这个属性 需要月光 cookieRemeberManager 类的引用
+            因此我需要一个 cookieremebermanager 对象 管理者 的bean
+            第二 去创建我的cookieremeber manager 对象
+            既然是一个cookie 管理者 一定需要一个 cookie 才能实现 对象的 管理
+            第三 去创建一个cookie 对象 (创建一个cvookie 对象  是shiro  为我们提供的cookie 对象)
+            创建之后 可以进行一些自定义的参数设置   来自定义一些自己需要的cookie 对象的参数
+        -->
+        <!--声明一个realm 管理者的类对象  交由我的spring 工厂来创建 -->
+        <property name="rememberMeManager" ref="cookieRememberMeManager"></property>
+
+
+    </bean>
+    <!--自定义realm 进行声明并创建我的realm 对象 交给spring 创建对象-->
+
+    <bean id="realm" class="com.baizhi.realm.MyRealm" />
+    <!--这是一个ccookie remeberManager (记住我的管理器) 对象 -->
+
+    <bean   id="cookieRememberMeManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager">
+        <property name="cookie" ref="cookie"></property> <!--  添加 cookie 属性 进行引用我的 shiro 类中自己定义的 cookie 对象-->
+    </bean>
+
+    <!-- 创建 我的自定义cookie 对象  (属于 shiro 类中的对象)-->
+    <bean id="cookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+        <property name="maxAge" value="604800"></property><!-- 给我的 cookie 设置 存活时间-->
+        <property name="name" value="rm" /><!--给我的cookie 设置名字-->
+        <property name="path" value="/" /><!--这是设置cookie 的有效范围 是全局有效-->
+    </bean>
+    <!--读取小配置文件-->
+    <context:property-placeholder location="classpath:/jdbc.properties" />
+        <!--spring 4 org.springframework.jdbc.datasource.DriverManagerDataSource  mybatis jar 包变化 -->
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+
+        <property name="driverClassName" value="${mysql.driverClassName}" />
+        <property name="username" value="${mysql.user}" />
+        <property name="password" value="${mysql.password}"  />
+        <property name="url" value="${mysql.url}" />
+    </bean>
+
+    <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="typeAliasesPackage" value="com.baizhi.entity"/>
+        <property name="mapperLocations" value="classpath:com/baizhi/mapper/*DAOMapper.xml" />
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sessionFactory" />
+        <property name="basePackage" value="com.baizhi.dao" />
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+</beans>

@@ -1,0 +1,80 @@
+
+<web-app>
+  <display-name>Archetype Created Web Application</display-name>
+
+
+  <!--shiro的过滤器-->
+  <filter>
+    <filter-name>shiroFilter</filter-name>
+    <!-- 只负责拦截过滤访问系统的请求-->
+    <!-- DelegatingFilterProxy(委派过滤器代理) -->
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    <!--注入参数-->
+    <!--声明注入参数名称-->
+    <init-param>
+      <param-name>targetBeanName</param-name>
+      <!--必须 和我的spring.xml 中的 ShiroFilterFactoryBean 类的id 一样  -->
+      <!--注入 由我的spring 工厂创建的ashiroFilterFactyorBean 类对象 -->
+      <param-value>shiroFilterFactoryBean</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>shiroFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <!--启动spring.xml-->
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:spring.xml</param-value>
+  </context-param>
+
+  <filter>
+    <filter-name>login</filter-name>
+    <filter-class>com.baizhi.LoginFilter.LoginFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>login</filter-name>
+    <url-pattern>/main/main.jsp</url-pattern>
+  </filter-mapping>
+
+
+  <!--编码拦截-->
+  <filter>
+    <filter-name>encodingfilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+      <param-name>forceEncoding</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>encodingfilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <!--开启拦截-->
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+
+  <!--前置拦截器-->
+  <servlet>
+    <servlet-name>dispatcher</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:springmvc.xml</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>dispatcher</servlet-name>
+    <url-pattern>/</url-pattern>
+
+  </servlet-mapping>
+</web-app>

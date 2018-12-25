@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.baizhi.dao.BuddhaMenuDAO">
+    <resultMap id="bmmap" type="BuddhaMenu">
+        <id property="menuid" column="menuid" />
+         <result property="menuname" column="menuname" />
+         <result property="createdate" column="createdate" />
+         <result property="imghead" column="imghead" />
+         <result property="grade" column="grade" />
+         <result property="parantid" column="parantid" />
+         <result property="href" column="href" />
+            <collection property="menuList" ofType="BuddhaMenu">
+                <id property="menuid" column="mid" />
+                <result property="menuname" column="mname" />
+                <result property="createdate" column="ctd" />
+                <result property="imghead" column="img" />
+                <result property="grade" column="gre" />
+                <result property="parantid" column="pid" />
+                <result property="href" column="hr" />
+            </collection>
+    </resultMap>
+
+    <select id="queryall" resultMap="bmmap">
+        select
+        e.menuid,
+        e.menuname,
+        e.createdate,
+        e.imghead,
+        e.grade,
+        e.parantid,
+        e.href,
+         e1.menuid as mid,
+        e1.menuname as mname,
+        e1.createdate as ctd,
+        e1.imghead as img,
+        e1.grade as gre,
+        e1.parantid as pid,
+        e1.href as hr
+        from BuddhaMenu e
+        inner join  BuddhaMenu e1
+        on e1.parantid=e.menuid
+    </select>
+</mapper>

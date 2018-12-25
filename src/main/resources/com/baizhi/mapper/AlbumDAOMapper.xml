@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.baizhi.dao.AlbumDAO">
+
+    <resultMap id="alnumMap" type="Album">
+        <id column="id" property="id" />
+        <result  column="title" property="title"/>
+        <result  column="cover" property="cover"/>
+        <result  column="author" property="author"/>
+        <result  column="count" property="count"/>
+        <result  column="brief" property="brief"/>
+        <result  column="createname" property="createname"/>
+        <result  column="publisdate" property="publisdate"/>
+        <result  column="broadcast" property="broadcast"/>
+        <result  column="score" property="score"/>
+            <collection property="children" ofType="Chapter">
+                <id column="cid" property="id" />
+                <result  column="cti" property="title"/>
+                <result  column="size" property="size"/>
+                <result  column="duration" property="duration"/>
+                <result  column="downpath" property="downpath"/>
+                <result  column="uploaddate" property="uploaddate"/>
+                <result  column="albumid" property="albumid"/>
+                <result  column="albumtitle" property="albumtitle"/>
+            </collection>
+    </resultMap>
+    <select id="queryAlbumPage" resultMap="alnumMap" >
+    select
+          a.id, a.title,a.cover, a.author, a.count,a.brief,a.createname,
+          a.publisdate,a.broadcast, a.score,
+          c.id as cid, c.title as cti, c.size, c.duration,
+          c.downpath,c.uploaddate,c.albumid,c.albumtitle
+      from  album a
+      left join chapter c
+      on a.id =c.albumid
+	  //  limit 第一个参数是 从哪一条开始 ,第二个参数是开始条之后显示几个 
+      limit #{page},#{rows}
+    </select>
+
+    <select id="queryByStr" resultType="Album">
+    select id,
+        title,
+        cover,
+        author,
+        count,
+        brief,
+        createname,
+        publisdate,
+        broadcast,
+        score
+        from album where id=#{str}
+    </select>
+
+
+    <insert id="insert" parameterType="Album">
+      insert into album values(#{id},#{title},
+      #{cover},#{author},#{createname},#{count},#{brief},
+      #{publisdate},#{score},#{broadcast},null,null,null,null)
+    </insert>
+
+    <delete id="delete" parameterType="Album">
+        delete from album where id=#{id}
+    </delete>
+
+    <select id="queryConutAlbum" resultType="Integer">
+         select count(*)
+              from  album a
+              left join chapter c
+              on a.id =c.albumid
+    </select>
+
+    <select id="queryCount" resultType="Integer">
+       select count(*)
+      from  album a
+      left join chapter c
+      on a.id =c.albumid
+	where a.id=#{id}
+    </select>
+
+    <update id="updateAlbum" parameterType="Album">
+          update album set count=#{count}  where id=#{id}
+    </update>
+
+</mapper>

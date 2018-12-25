@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.baizhi.dao.GuruDAO">
+
+    <resultMap id="guruMap" type="Guru">
+        <id property="guruid" column="guruid" />
+        <result property="guruname" column="guruname" />
+        <result property="gurustatus" column="gurustatus" />
+        <result property="createname" column="createname" />
+        <result property="createtime" column="createtime" />
+        <result property="gender" column="gender" />
+        <result property="profile" column="profile" />
+        <collection property="children" ofType="Article">
+            <id property="articleid" column="articleid" />
+            <result property="articlename" column="articlename" />
+            <result property="createname" column="createname" />
+            <result property="publishtime" column="publishtime" />
+            <result property="figurepath" column="figurepath" />
+            <result property="guruid" column="guruid" />
+            <result property="content" column="content" />
+            <result property="guruname" column="guruname" />
+        </collection>
+    </resultMap>
+
+
+    <sql id="sqlGuru">
+        select  guruid,guruname,gurustatus,createname,createtime,gender,profile,ex4,ex5
+    </sql>
+
+
+    <select id="queryAllGuru" resultMap="guruMap">
+    <include refid="sqlGuru" /> from guru
+    </select>
+
+    <select id="queryall" resultMap="guruMap">
+        select  g.guruid,
+        g.guruname,
+        g.gurustatus,
+        g.createname,
+        g.createtime,
+        g.gender,
+        a.articleid,
+        a.articlename,
+        a.createname,
+        a.publishtime,
+        a.figurepath,
+        a.guruid,
+        a.content,
+        a.guruname
+        from guru g
+        inner join article a
+        on g.guruid=a.guruid
+    </select>
+
+    <update id="updateGuru" parameterType="Guru">
+        update guru
+        <set>
+        <if test="guruname!=null">
+            guruname=#{guruname},
+        </if>
+        <if test="gurustatus!=null">
+            gurustatus=#{gurustatus},
+         </if>
+        </set>
+        where guruid=#{guruid}
+    </update>
+
+    <insert id="insert" parameterType="Guru">
+      insert into guru values(#{guruid},#{guruname},
+              #{gurustatus},#{createname},#{createtime},
+              #{gender},#{profile},#{ex4},#{ex5})
+    </insert>
+
+
+</mapper>

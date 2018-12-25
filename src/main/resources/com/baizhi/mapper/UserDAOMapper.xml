@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.baizhi.dao.UserDAO">
+
+
+    <insert id="insert" parameterType="User">
+      insert into user values(#{userid},#{username},#{profile},#{nikename},
+      #{gender},#{province},#{city},#{sign},#{registertime},#{status},
+      #{password},#{phone},#{salt},
+      #{ex2},#{ex3},#{ex4},#{ex5})
+    </insert>
+
+    <select id="queryall" resultType="User">
+        select userid, username,profile,nikename,gender,province,
+        city,sign,registertime,status,password,phone,salt
+         from user
+    </select>
+
+    <update id="updateUser" parameterType="User">
+        update user
+        <set>
+            <if test="username!=null">
+                username=#{username},
+            </if>
+            <if test="profile!=null">
+                profile=#{profile},
+            </if>
+            <if test="nikename!=null">
+                nikename=#{nikename},
+            </if>
+            <if test="gender!=null">
+                gender=#{gender},
+            </if>
+            <if test="province!=null">
+                province=#{province},
+            </if>
+            <if test="city!=null">
+                city=#{city},
+            </if>
+            <if test="sign!=null">
+                sign=#{sign},
+            </if>
+            <if test="status!=null">
+                status=#{status},
+            </if>
+            <if test="password!=null">
+                password=#{password},
+            </if>
+            <if test="phone!=null">
+                phone=#{phone}
+            </if>
+        </set>
+      where userid=#{userid}
+    </update>
+
+    <select id="queryByStr" resultType="User">
+       select userid,username,profile,nikename,gender,province,
+        city,sign,registertime,status,password,phone,salt
+         from user where phone=#{str}
+    </select>
+</mapper>
